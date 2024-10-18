@@ -1,13 +1,29 @@
-require('dotenv').config(); // Load environment variables from .env
+require('dotenv').config();
 
 const express = require('express');
+const { initDB } = require('./src/config/database');
+const loadCSV = require('./src/services/csvService');
+const awardRoutes = require('./src/routes/awardRoutes');
+const errorHandler = require('./src/middleware/errorHandler');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('./src/config/swaggerOptions'); 
+
 const app = express();
-const port = process.env.PORT || 3000; // Use PORT from .env or default to 3000
+app.use(errorHandler); 
 
-app.get('/', (req, res) => {
-  res.send('API is running');
+const port = process.env.PORT || 3000;
+
+initDB(); 
+
+
+loadCSV().then(() => {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}).catch(error => {
+  console.error('Error loading CSV:', error); 
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/api', awardRoutes);
