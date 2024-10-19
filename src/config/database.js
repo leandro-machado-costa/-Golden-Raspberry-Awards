@@ -5,36 +5,26 @@ const db = new sqlite3(process.env.DATABASE_URL || ':memory:');
  * Initializes the database and creates the movies table if it doesn't exist.
  */
 const initDB = () => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS movies (
-      year INTEGER,
-      title TEXT,
-      studios TEXT,
-      producers TEXT,
-      winner TEXT
-    );
-  `);
 
   db.exec(`
-CREATE VIEW IF NOT EXISTS producer_intervals AS
-WITH ProducerWins AS (
-  SELECT
-    producers,
-    year,
-    LAG(year) OVER (PARTITION BY producers ORDER BY year) AS previousWin
-  FROM movies
-  WHERE winner = 'yes'
-)
-SELECT
-  producers,
-  (year - previousWin) AS interval,
-  previousWin,
-  year
-FROM ProducerWins
-WHERE previousWin IS NOT NULL;
+    CREATE TABLE movies (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  studios TEXT,
+  winner TEXT);`);
 
-  `);
-  
+  db.exec(`
+  CREATE TABLE producers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL);`);
+
+  db.exec(`
+  CREATE TABLE movie_producers (
+  movie_id INTEGER,
+  producer_id INTEGER,
+  FOREIGN KEY (movie_id) REFERENCES movies(id),
+  FOREIGN KEY (producer_id) REFERENCES producers(id));`);
 };
 
 module.exports = { db, initDB };

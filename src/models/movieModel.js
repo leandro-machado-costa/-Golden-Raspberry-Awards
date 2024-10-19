@@ -5,14 +5,33 @@ const { db } = require('../config/database');
  * @param {Object} movie - Movie object containing year, title, studios, producers, and winner status.
  */
 const insertMovie = (movie) => {
+
+
+  const movieStmt = db.prepare('INSERT INTO movies (year, title, studios, winner) VALUES (?, ?, ?, ?)');
+  const movieResult = movieStmt.run(movie.year, movie.title, movie.studios, movie.winner);
+  const movieId = movieResult.lastInsertRowid;
+
   const producers = movie.producers
-  .split(/,| and /) 
-  .map(producer => producer.trim())
-  .filter(producer => producer !== "");
-  
+    .split(/,| and /)  // Split producers by comma or " and "
+    .map(producer => producer.trim())
+    .filter(producer => producer !== "");
+
   producers.forEach(producer => {
-    const stmt = db.prepare('INSERT INTO movies (year, title, studios, producers, winner) VALUES (?, ?, ?, ?, ?)');
-    stmt.run(movie.year, movie.title, movie.studios, producer, movie.winner);
+
+    const existingProducer = db.prepare('SELECT id FROM producers WHERE name = ?').get(producer);
+
+    let producerId;
+    if (existingProducer) {
+
+      producerId = existingProducer.id;
+    } else {
+      const producerStmt = db.prepare('INSERT INTO producers (name) VALUES (?)');
+      const producerResult = producerStmt.run(producer);
+      producerId = producerResult.lastInsertRowid;
+    }
+
+    const relationshipStmt = db.prepare('INSERT INTO movie_producers (movie_id, producer_id) VALUES (?, ?)');
+    relationshipStmt.run(movieId, producerId);
   });
 };
 
