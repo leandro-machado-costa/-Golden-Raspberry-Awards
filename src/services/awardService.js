@@ -6,8 +6,9 @@ const { db } = require('../config/database');
  * 
  * @returns {Object} - Object containing 'min' and 'max' intervals for producers.
  */
+
+
 const calculateProducersInterval = () => {
-  // Query to get the producers and their win years, calculating the intervals between wins
   const query = `
     WITH ProducerWins AS (
       SELECT 

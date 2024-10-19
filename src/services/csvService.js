@@ -2,21 +2,31 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { insertMovie } = require('../models/movieModel');
 
-/**
- * Service to load data from a CSV file and insert it into the database.
- * 
- * @returns {Promise} - Resolves once the CSV has been processed.
- */
-const loadCSV = () => {
+function getCSVFilePath() {
+  return process.env.CSV_FILE_PATH || "data/movielist.csv";
+}
+
+function processRow(row) {
+  insertMovie(row);
+}
+
+function createCSVStream(filePath) {
+  return fs.createReadStream(filePath).pipe(csv({ separator: ';' }));
+}
+
+function handleCSVStream(stream) {
   return new Promise((resolve, reject) => {
-    fs.createReadStream(process.env.CSV_FILE_PATH || "data/movielist.csv")
-      .pipe(csv({ separator: ';' }))
-      .on('data', (row) => {
-        insertMovie(row);
-      })
+    stream
+      .on('data', (row) => processRow(row))
       .on('end', () => resolve())
-      .on('error', (error) => reject(error)); 
+      .on('error', (error) => reject(error));
   });
+}
+
+const loadCSV = () => {
+  const filePath = getCSVFilePath();
+  const stream = createCSVStream(filePath);
+  return handleCSVStream(stream);
 };
 
-module.exports = loadCSV;
+module.exports = { loadCSV };

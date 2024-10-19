@@ -42,7 +42,7 @@ This project is a RESTful API built with Node.js and Express.js. It processes mo
     To start the server, run:
 
     ```bash
-    npm start
+    node app.js 
     ```
 
 5. Access the API:
@@ -99,7 +99,7 @@ This project is a RESTful API built with Node.js and Express.js. It processes mo
     API documentation is available at:
 
     ```bash
-    http://localhost:3000/api-docs
+    http://localhost:3000/docs
     ```
 
 ## Running Tests

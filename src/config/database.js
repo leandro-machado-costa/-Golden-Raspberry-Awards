@@ -27,4 +27,7 @@ const initDB = () => {
   FOREIGN KEY (producer_id) REFERENCES producers(id));`);
 };
 
-module.exports = { db, initDB };
+module.exports = {
+  db,
+  initDB,
+};
