@@ -104,11 +104,11 @@ This project is a RESTful API built with Node.js and Express.js. It processes mo
 
 ## Running Tests
 
-If your project has unit tests (for example, using Jest), you can run them with:
+Unit tests:
 
 ```bash
 npm test
-
+```
 
 ## Available Endpoints
 
@@ -135,6 +135,8 @@ Example response:
     }
   ]
 }
+```
+
 
 ## Project Structure
 
@@ -150,6 +152,8 @@ Example response:
 Dockerfile          # Docker configuration
 docker-compose.yml  # Docker Compose configuration
 .env                # Environment variables
+```
+
 
 ## License
 
